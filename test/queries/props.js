@@ -20,11 +20,28 @@ test('should evaluate object from context passing dynamic props', t => {
 })
 
 test('should evaluate object from context passing dynamic props, using fn prop', t => {
-  const ctx = { name: 'John', auth: { via: 'gh', token: '12873' } }
+  const ctx = { name: 'John', auth: { via: 'gh', token: '12873', group: 'seventh' } }
+  const when = new Date()
   const result = props({
     username: prop('name'),
-    token: prop('auth.token')
+    token: prop('auth.token'),
+    teams: ['Woah!', 'Klo'],
+    when: when,
+    nested: {
+      group: prop('auth.group')
+    }
   })(ctx)
 
-  t.deepEqual(result, { username: 'John', token: '12873' })
+  t.deepEqual(
+    result,
+    {
+      username: 'John',
+      token: '12873',
+      teams: ['Woah!', 'Klo'],
+      when: when,
+      nested: {
+        group: 'seventh'
+      }
+    }
+  )
 })

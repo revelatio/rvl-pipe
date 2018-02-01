@@ -22,3 +22,14 @@ test('throws if predicates falsy', t => {
       t.pass()
     })
 })
+
+test('throws if predicates falsy, no error message', t => {
+  return startWith()
+    .then(should(() => false))
+    .then(() => {
+      t.fail()
+    })
+    .catch(() => {
+      t.pass()
+    })
+})
