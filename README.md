@@ -1,6 +1,6 @@
 # rvl-pipe
 
-[![CircleCI](https://circleci.com/gh/revelatio/rvl-pipe/tree/master.svg?style=svg)](https://circleci.com/gh/revelatio/rvl-pipe/tree/master)
+[![Build Status](https://travis-ci.org/revelatio/rvl-pipe.svg?branch=master)](https://travis-ci.org/revelatio/rvl-pipe)
 
 Helper functions for easier async pipelining/composing of promises
 
