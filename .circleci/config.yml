@@ -3,6 +3,9 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
+general:
+  artifacts:
+    - "coverage"
 jobs:
   build:
     docker:
@@ -36,4 +39,8 @@ jobs:
       # run tests!
       - run: yarn test
 
+      - run: yarn report
+
+      - store_artifacts:
+          path: ~/repo/coverage
 
