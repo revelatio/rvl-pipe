@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/revelatio/rvl-pipe.svg?branch=master)](https://travis-ci.org/revelatio/rvl-pipe)
 [![Coverage Status](https://coveralls.io/repos/github/revelatio/rvl-pipe/badge.svg?branch=master)](https://coveralls.io/github/revelatio/rvl-pipe?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/revelatio/rvl-pipe/badge.svg)](https://snyk.io/test/github/revelatio/rvl-pipe)
 
 Helper functions for easier async pipelining/composing of promises
 
