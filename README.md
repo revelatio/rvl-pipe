@@ -21,6 +21,15 @@ modified.
 query the context object using this approach. We have 2 types of functions:
 composability and querying, and also some error handling helpers.
 
+You can require/import the helpers you need.
+
+```javascript
+const { should, each, startWith iff, prop, props } = require('rvl-pipe')
+
+// as ES6 Modules
+import { should, each, startWith, iff, prop, props } from 'rvl-pipe'
+```
+
 ### Composition functions
 - `startWith`: this is mostly a bootstraping function. It takes an object,
 wraps it in a promise and passes down as context in the first
@@ -111,7 +120,7 @@ return startWith()
 
 ```javascript
 return startWith({ name: 'Mary' })
-    .then(set({ name: 'John })) // statically
+    .then(set({ name: 'John' })) // statically
     .then(set(prev => ({ last: 'Doe' })))  // dinamically
 
 // returns { name: 'John', last: 'Doe' }
