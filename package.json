@@ -4,7 +4,7 @@
   "description": "Functions for easier async pipelining/composing of promises",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ava --verbose",
     "lint": "standard"
   },
   "keywords": [
@@ -12,7 +12,7 @@
     "promises",
     "async"
   ],
-  "repository": "",
+  "repository": "https://github.com/revelatio/rvl-pipe",
   "author": "Ernesto Freyre",
   "license": "MIT",
   "dependencies": {
@@ -20,6 +20,7 @@
     "ramda": "^0.25.0"
   },
   "devDependencies": {
+    "ava": "^0.25.0",
     "standard": "^10.0.3"
   }
 }
