@@ -242,12 +242,14 @@ If you need to send and error in the pipeline you must use the `ContextError` ty
 this will help error handling to recover and close the necessary resources. The context
 must be passed in the creating of the `ContextError` object.
 
+```javascript
 const myAsyncTask = () => context => {
     // doing some async stuff
 
     // oh no we found a error, lets throw
     throw new ContextError('MyAsyncTaskError', context)
 }
+```
 
 If you are throwing the error as part of a promise chain inside your async task you can do
 
