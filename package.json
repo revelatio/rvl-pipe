@@ -1,10 +1,10 @@
 {
   "name": "rvl-pipe",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Functions for easier async pipelining/composing of promises",
   "main": "index.js",
   "scripts": {
-    "test": "ava --verbose",
+    "test": "nyc ava",
     "lint": "standard"
   },
   "keywords": [
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "ava": "^0.25.0",
+    "nyc": "^11.4.1",
     "standard": "^10.0.3"
   }
 }
