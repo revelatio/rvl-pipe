@@ -1,5 +1,7 @@
 # rvl-pipe
 
+[![CircleCI](https://circleci.com/gh/revelatio/rvl-pipe/tree/master.svg?style=svg)](https://circleci.com/gh/revelatio/rvl-pipe/tree/master)
+
 Helper functions for easier async pipelining/composing of promises
 
 Promises are a simple (and cool) way of doing async programming in
