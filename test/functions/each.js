@@ -18,11 +18,10 @@ test('runs all tasks in serie', t => {
     })
 })
 
-
 test('starting with each good for reusable steps', t => {
   const step = each(
     delayedAsync(100, { name: 'John' }),
-    delayedAsync(100, { last: 'Doe' }),
+    delayedAsync(100, { last: 'Doe' })
   )
 
   t.truthy(step)

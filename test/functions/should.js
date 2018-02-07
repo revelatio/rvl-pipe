@@ -34,7 +34,6 @@ test('throws if predicates falsy, no error message', t => {
     })
 })
 
-
 test('should uses a default empty object', t => {
   const result = should(true, 'Fail')()
   t.deepEqual(result, {})
@@ -42,10 +41,9 @@ test('should uses a default empty object', t => {
 
 test('should uses a default empty object on predicate false', t => {
   const error = t.throws(() => {
-    const result = should(false, 'Fail')()
+    should(false, 'Fail')()
+  }, ContextError)
 
-  }, ContextError);
-
-  t.is(error.message, 'Fail');
+  t.is(error.message, 'Fail')
   t.deepEqual(error.context, {})
 })

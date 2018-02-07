@@ -18,7 +18,7 @@ test('createTracer uses a default empty object', t => {
     t.is(value, undefined)
   })
 
-  const result = customTracer('someProp')()
+  return customTracer('someProp')()
     .then(ctx => {
       t.deepEqual(ctx, {})
     })
