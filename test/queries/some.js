@@ -23,3 +23,8 @@ test('should evaluate true if any element is truthy for dynamic values', t => {
       t.deepEqual(context, { name: 'John', last: 'Doe', shouldPass: false })
     })
 })
+
+test('some uses a default empty object', t => {
+  const result = some(() => false, () => true)()
+  t.true(result)
+})

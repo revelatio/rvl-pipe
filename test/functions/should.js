@@ -1,5 +1,5 @@
 const test = require('ava')
-const { startWith, should } = require('../../index')
+const { startWith, should, ContextError } = require('../../index')
 
 test('doesnt throw if predicates truthy', t => {
   return startWith()
@@ -32,4 +32,20 @@ test('throws if predicates falsy, no error message', t => {
     .catch(() => {
       t.pass()
     })
+})
+
+
+test('should uses a default empty object', t => {
+  const result = should(true, 'Fail')()
+  t.deepEqual(result, {})
+})
+
+test('should uses a default empty object on predicate false', t => {
+  const error = t.throws(() => {
+    const result = should(false, 'Fail')()
+
+  }, ContextError);
+
+  t.is(error.message, 'Fail');
+  t.deepEqual(error.context, {})
 })

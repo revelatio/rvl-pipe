@@ -16,3 +16,8 @@ test('sets a dynamic value in the context', t => {
       t.deepEqual(context, { name: 'John', welcome: 'Welcome John' })
     })
 })
+
+test('set uses a default empty object', t => {
+  const setted = set({ name: 'John' })()
+  t.deepEqual(setted, { name: 'John' })
+})

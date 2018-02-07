@@ -23,3 +23,8 @@ test('should evaluate true if all elements truthy for dynamic values', t => {
       t.deepEqual(context, { name: 'John', last: 'Doe', shouldPass: true })
     })
 })
+
+test('every uses a default empty object', t => {
+  const result = every(() => true, () => true)()
+  t.true(result)
+})

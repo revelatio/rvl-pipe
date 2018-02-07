@@ -30,3 +30,8 @@ test('should evaluate truthy for dynamic values', t => {
 
   t.truthy(result)
 })
+
+test('not uses a default empty object', t => {
+  const result = not(() => true)()
+  t.false(result)
+})

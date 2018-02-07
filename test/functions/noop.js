@@ -8,3 +8,8 @@ test('performs no operation', t => {
       t.deepEqual(context, { name: 'John', last: 'Doe' })
     })
 })
+
+test('noop uses a default empty object', t => {
+  const result = noop()()
+  t.deepEqual(result, {})
+})

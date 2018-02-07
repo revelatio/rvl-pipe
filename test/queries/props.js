@@ -45,3 +45,8 @@ test('should evaluate object from context passing dynamic props, using fn prop',
     }
   )
 })
+
+test('props uses a default empty object', t => {
+  const result = props({ name: 'John' })()
+  t.deepEqual(result, { name: 'John'})
+})

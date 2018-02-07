@@ -36,3 +36,8 @@ test('should evaluate true for both dynamic values', t => {
       t.deepEqual(context, { name: 'John', last: 'Doe', otherName: 'john' })
     })
 })
+
+test('equals uses a default empty object', t => {
+  const result = equals(() => 'A', () => 'A')()
+  t.true(result)
+})
