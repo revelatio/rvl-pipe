@@ -1,23 +1,23 @@
 const test = require('ava')
-const { startWith, set } = require('../../index')
+const { set } = require('../../index')
 
 test('sets a static value in the context', t => {
-  return startWith()
-    .then(set({ name: 'John' }))
+  return set({ name: 'John' })()
     .then(context => {
       t.deepEqual(context, { name: 'John' })
     })
 })
 
 test('sets a dynamic value in the context', t => {
-  return startWith({ name: 'John' })
-    .then(set(prev => ({ welcome: `Welcome ${prev.name}` })))
+  return set(prev => ({ welcome: `Welcome ${prev.name}` }))({ name: 'John' })
     .then(context => {
       t.deepEqual(context, { name: 'John', welcome: 'Welcome John' })
     })
 })
 
 test('set uses a default empty object', t => {
-  const setted = set({ name: 'John' })()
-  t.deepEqual(setted, { name: 'John' })
+  return set({ name: 'John' })()
+    .then(context => {
+      t.deepEqual(context, { name: 'John' })
+    })
 })

@@ -1,9 +1,8 @@
 const test = require('ava')
-const { startWith, should, ContextError } = require('../../index')
+const { should, ContextError } = require('../../index')
 
 test('doesnt throw if predicates truthy', t => {
-  return startWith()
-    .then(should(() => true, 'ShouldNotFail'))
+  return should(() => true, 'ShouldNotFail')()
     .then(() => {
       t.pass()
     })
@@ -13,8 +12,7 @@ test('doesnt throw if predicates truthy', t => {
 })
 
 test('throws if predicates falsy', t => {
-  return startWith()
-    .then(should(() => false, 'ShouldFail'))
+  return should(() => false, 'ShouldFail')()
     .then(() => {
       t.fail()
     })
@@ -24,8 +22,7 @@ test('throws if predicates falsy', t => {
 })
 
 test('throws if predicates falsy, no error message', t => {
-  return startWith()
-    .then(should(() => false))
+  return should(() => false)()
     .then(() => {
       t.fail()
     })
@@ -35,15 +32,18 @@ test('throws if predicates falsy, no error message', t => {
 })
 
 test('should uses a default empty object', t => {
-  const result = should(true, 'Fail')()
-  t.deepEqual(result, {})
+  return should(true, 'Fail')()
+    .then(context => {
+      t.deepEqual(context, {})
+    })
 })
 
 test('should uses a default empty object on predicate false', t => {
-  const error = t.throws(() => {
-    should(false, 'Fail')()
-  }, ContextError)
-
-  t.is(error.message, 'Fail')
-  t.deepEqual(error.context, {})
+  return should(false, 'Fail')()
+    .then(() => {
+      t.fail()
+    })
+    .catch(() => {
+      t.pass()
+    })
 })

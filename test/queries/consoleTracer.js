@@ -1,5 +1,5 @@
 const test = require('ava')
-const { consoleTracer, startWith, set } = require('../../index')
+const { consoleTracer, each, set } = require('../../index')
 
 let originalLog
 
@@ -11,9 +11,10 @@ test.before('faking console.log', t => {
 })
 
 test('should log using console tracer', t => {
-  return startWith()
-    .then(set({ name: 'John' }))
-    .then(consoleTracer('name'))
+  return each(
+    set({ name: 'John' }),
+    consoleTracer('name')
+  )()
     .then(() => {
       t.pass()
     })

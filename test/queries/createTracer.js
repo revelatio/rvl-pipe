@@ -1,5 +1,5 @@
 const test = require('ava')
-const { createTracer, startWith, set } = require('../../index')
+const { createTracer, each, set } = require('../../index')
 
 test('should log using custom tracer', t => {
   const customTracer = createTracer((path, value) => {
@@ -7,9 +7,10 @@ test('should log using custom tracer', t => {
     t.is(value, 'John')
   })
 
-  return startWith()
-    .then(set({ name: 'John' }))
-    .then(customTracer('name'))
+  return each(
+    set({ name: 'John' }),
+    customTracer('name')
+  )()
 })
 
 test('createTracer uses a default empty object', t => {
