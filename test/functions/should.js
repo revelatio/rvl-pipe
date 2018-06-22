@@ -1,5 +1,5 @@
 const test = require('ava')
-const { should, ContextError } = require('../../index')
+const { should } = require('../../index')
 
 test('doesnt throw if predicates truthy', t => {
   return should(() => true, 'ShouldNotFail')()

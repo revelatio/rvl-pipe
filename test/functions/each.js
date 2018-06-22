@@ -1,6 +1,6 @@
 const test = require('ava')
-const { each } = require('../../index')
-const { delayedAsync } = require('../helpers/delayed-async')
+const { each, capture, set, noop } = require('../../index')
+const { delayedAsync, delayedFail } = require('../helpers/delayed-async')
 
 test('runs all tasks in serie', t => {
   const started = Date.now()
@@ -28,5 +28,91 @@ test('starting with each good for reusable steps', t => {
   return step()
     .then(ctx => {
       t.deepEqual(ctx, { name: 'John', last: 'Doe' })
+    })
+})
+
+test('async step fails, context remains untouched', t => {
+  return each(
+    delayedAsync(100, { name: 'John' }),
+    delayedFail(100, 'CustomError'),
+    delayedAsync(100, { last: 'Doe' })
+  )()
+    .then(context => {
+      t.fail()
+    })
+    .catch(error => {
+      t.is(error.message, 'CustomError')
+      t.deepEqual(error.context, {})
+    })
+})
+
+test('async step fails, recovers from error', t => {
+  return each(
+    delayedAsync(100, { name: 'John' }),
+    capture(
+      delayedFail(100, 'CustomError'),
+      set({ error: 'FailedAsync' })
+    ),
+    delayedAsync(100, { last: 'Doe' })
+  )()
+    .then(context => {
+      t.deepEqual(
+        context,
+        {
+          name: 'John',
+          last: 'Doe',
+          error: 'FailedAsync'
+        }
+      )
+    })
+    .catch(() => {
+      t.fail()
+    })
+})
+
+test('async step fails, recovers from different error types', t => {
+  return each(
+    delayedAsync(100, { name: 'John' }),
+    capture(
+      delayedFail(100, 'CustomError'),
+      {
+        'AnotherCustomError': set({ error: 'FailedAsyncWithAnotherCustomError' }),
+        'CustomError': set({ error: 'FailedAsyncWithCustomError' })
+      }
+    ),
+    delayedAsync(100, { last: 'Doe' })
+  )()
+    .then(context => {
+      t.deepEqual(
+        context,
+        {
+          name: 'John',
+          last: 'Doe',
+          error: 'FailedAsyncWithCustomError'
+        }
+      )
+    })
+    .catch(() => {
+      t.fail()
+    })
+})
+
+test('async step fails, no error type handler defined', t => {
+  return each(
+    delayedAsync(100, { name: 'John' }),
+    capture(
+      delayedFail(100, 'UnexpectedError'),
+      {
+        'ExpectedError': noop()
+      }
+    ),
+    delayedAsync(100, { last: 'Doe' })
+  )()
+    .then(context => {
+      t.fail()
+    })
+    .catch(error => {
+      t.is(error.message, 'UnexpectedError')
+      t.deepEqual(error.context, {})
     })
 })

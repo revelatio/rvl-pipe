@@ -1,6 +1,6 @@
 const test = require('ava')
 const { all } = require('../../index')
-const { delayedAsync } = require('../helpers/delayed-async')
+const { delayedAsync, delayedFail } = require('../helpers/delayed-async')
 const R = require('ramda')
 
 test('runs all tasks in parallel', t => {
@@ -22,5 +22,20 @@ test('all uses a default empty object', t => {
   return all(R.merge({ name: 'John' }), R.merge({ last: 'Doe' }))()
     .then(ctx => {
       t.deepEqual(ctx, { name: 'John', last: 'Doe' })
+    })
+})
+
+test('async step fails, context remains untouched', t => {
+  return all(
+    delayedAsync(100, { name: 'John' }),
+    delayedFail(100, 'CustomError'),
+    delayedAsync(100, { last: 'Doe' })
+  )()
+    .then(context => {
+      t.fail()
+    })
+    .catch(error => {
+      t.is(error.message, 'CustomError')
+      t.deepEqual(error.context, {})
     })
 })

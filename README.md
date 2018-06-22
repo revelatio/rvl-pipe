@@ -28,106 +28,126 @@ composability and querying, and also some error handling helpers.
 You can require/import the helpers you need.
 
 ```javascript
-const { should, each, startWith iff, prop, props } = require('rvl-pipe')
+const { should, each, iff, prop, props } = require('rvl-pipe')
 
 // as ES6 Modules
 import { should, each, startWith, iff, prop, props } from 'rvl-pipe'
 ```
 
 ### Composition functions
-- `startWith`: this is mostly a bootstraping function. It takes an object,
-wraps it in a promise and passes down as context in the first
-function all. You will usually start here. If no param is passed it will
-use an empty object `{}`
+Composition functions can be always described as:
 
 ```javascript
-return startWith({prop: 'value'})
+const createStep = (params) => context => Promise(context)
 ```
 
-- `each`: Runs a list of async functions serially, passing the context
-to all of them.
+So, basically functions that return a function that only takes the `context`
+return a Promise with the `context` after some async transformation. Or a rejection.
+
+This steps can then be reused in a async pipeline, where the `context` object gets passed down.
+
+We already provide some helper functions for several common cases like parallel execution, conditionals, noops, etc.
+
+- `each`: Composition function that runs other composition functions in sequence, passing the context
+to all of them and returning the resulting context.
 ```javascript
-return startWith({})
-    .then(each(
-        asyncTask1(...),
-        asyncTask2(...)
-    ))
+const runAll = each(
+    asyncTask1(...),
+    asyncTask2(...)
+)
+
+return runAll({})   // {} is the starting context
+    .then(context => {
+        // context will have the resulting context after asyncTask2
+    })
 ```
 
-`each` is very handy to make reusable composition
+`each` is very handy to make reusable composition of common steps.
 
 ```javascript
-const asyncStep = (...) => each(
+const myAsyncStep = each(
     doSomeAsync1(...),
     doSomeASync2(...)
 )
 
-return startWith({})
-    .then(asyncStep(...))
+return each(
+    myAsyncStep(...),
+    otherASyncStep(),
+    ...
+    yetAnotherAsyncStep(),
+    myAsyncStep()
+)()
 ```
 
-- `all`: Runs a list of async functions in parallel. Continues execution
-after all have finished.
+- `all`: Same as each but running all task in parallel and merging the resulting contexts.
 
 ```javascript
-return startWith({})
-    .then(all(
-        parallelAsyncTask1(...),
-        parallelAsyncTask2(...)
-    ))
+return all(
+    parallelAsyncTask1(...),
+    parallelAsyncTask2(...)
+)({})  // Starting context
 ```
 
 - `iff`: Performs a conditional step passing a condition (or predicate)
 and a async function. Also accepts an else async function.
 
 ```javascript
-return startWith()
-    .then(iff(
-        prop('account'),
-        asyncTask(...)
-    ))
+return iff(
+    prop('account'),
+    asyncTask(...)
+)({})
 
 // Else is possible too
+return iff(
+    prop('account'),
+    asyncTask(...),
+    elseAsyncTask(...)
+)()
 
-return startWith()
-    .then(iff(
-        prop('account'),
-        asyncTask(...),
-        elseAsyncTask(...)
-    ))
+// Negation (using Ramda's complement)
 
-// Negation
-return startWith()
-    .then(iff(
-        not(prop('account')),
-        asyncTask(...)
-    ))
+const { complement } = require('ramda')
+
+return iff(
+    complement(prop('account')),
+    asyncTask(...)
+)()
 ```
 
-- `should`: Performs a validation check for a property, it throws a
+- `should`: Performs a validation check for a property, it fails with a
 `ContextError` if the predicate is not satisfied.
 
 ```javascript
-return startWith({name: 'John'})
-    .then(should(prop('name')))  // passes
-    .then(should(prop('last')))  // throws
+return each(
+    should(prop('name')),  // passes
+    should(prop('last')),  // throws ContextError
+)({name: 'John'})
+
+// prop is a query function, check down for documentation
+
+// You can also define your custom error names
+return each(
+    should(prop('name')),  // passes
+    should(prop('last'), 'InvalidLastName'),  // throws ContextError(message='InvalidLastName', context=context)
+)({name: 'John'})
 ```
 
 - `noop`: This is a no brainer, does nothing, just returns the context.
 
 ```javascript
-return startWith()
-    .then(noop())
+return noop()({})
 ```
 
-- `set`: Will add/merge data into the context
+- `set`: Will add/merge data into the context. The parameters to this function can be a static object where a simple merge will be performed or a query function where the value depends on the context being passed.
 
 ```javascript
-return startWith({ name: 'Mary' })
-    .then(set({ name: 'John' })) // statically
-    .then(set(prev => ({ last: 'Doe' })))  // dinamically
+return each(
+    set({ name: 'John' }), // statically
+    set(context => ({ last: 'Doe' })),  // dinamically
+    set(context => ({ initial: context.name[0] }))
+)({ name: 'Mary' })
 
-// returns { name: 'John', last: 'Doe' }
+// returns { name: 'John', last: 'Doe', initial: 'J' }
 ```
 
 ### Querying functions
@@ -138,15 +158,16 @@ allow to perform logical operations on them.
 - `equals`: returns the triple equality of two query functions
 
 ```javascript
-return startWith({ a: 3, b: 3 })
-    .then(iff(
+return each(
+    iff(
         equals(prop('a'), 3),   // checkink a prop with a static value
         doAsyncTask(...)
-    ))
-    .then(iff(
+    ),
+    iff(
         equals(prop('a'), prop('b')),   // checking 2 props dynamically
         doAsyncTask(...)
-    ))
+    )
+)({ a: 3, b: 3 })
 ```
 
 - `passData`: is a helper function to be able to build async tasks or
@@ -166,58 +187,52 @@ const myAsyncStep = prop => context => {
 - `every`: Evaluates true if all values or predicates are true
 
 ```javascript
-return startWith()
-    .then(iff(
-        every(prop('a'), prop('b'), true, 10),  // a and b must evaluate truthy for doAsyncTask to run
-        doASyncTask(...)
-    ))
+return iff(
+    every(prop('a'), prop('b'), true, 10),  // a and b must evaluate truthy for doAsyncTask to run
+    doASyncTask(...)
+)()
 ```
 
 - `some`: Same as every but we only need one to be true
 ```javascript
-return startWith()
-    .then(iff(
-        some(prop('a'), prop('b')), // a or b should be truthy for doAsyncTask to run
-        doAsyncTask(...)
-    ))
+return iff(
+    some(prop('a'), prop('b')), // a or b should be truthy for doAsyncTask to run
+    doAsyncTask(...)
+)()
 ```
 
-- `not`: This is a simple complement function. The interesting part is that if we pass a
-function `not(fn)` will return a function that negates the result of the wrapped function.
+- `prop`: returns the query function for the value of a prop. It can be nested via dots. This is only a property lookup in a object.
 
 ```javascript
-return startWith()
-    .then(iff(
-        not(prop('a')),
-        doAsyncTask(...)
-    ))
-```
+const getUserName = prop('user.name')
 
-- `prop`: returns the value of a prop. It can be nested via dots.
+const name = getUserName({ user: { name: 'John' }})  // name === John
 
-```javascript
-return startWith()
-    .then(iff(
-        prop('user.name'),
-        doAsyncTask(...)
-    ))
+return iff(
+    getUserName,
+    doAsyncTask(...)
+)()
 ```
 
 - `props`: Helper to construct objects where props can be static or dynamically evaluated
 
 ```javascript
 const createAccountDocument = props({
-    user: prop('auth.user'),
-    token: prop('auth.token'),
-    newUser: true,
-    team: {
-        name: prop('auth.team')  // nested props too :)
+    user: {
+        name: prop('auth.username'),
+        token: prop('auth.token'),
+        newUser: true,
+        team: {
+            name: prop('auth.team')  // nested props too :)
+        }
     }
 })
 
-return startWith()
-    .then(doAsyncAuth())        // Asumming this adds prop 'auth' to context
-    .then(saveToDB(createAccountDocument))
+return each(
+    doAsyncAuth(),        // Asumming this adds prop 'auth' to context
+    set(createAccountDocument),
+    saveToDB()
+)()
 ```
 
 - `createTracer`: Sometimes we need to trace some properties on the context.
@@ -229,54 +244,80 @@ const logger = createTracer((path, value) => {
     // perform a log of the path and the value on our logging service
 })
 
-return startWith()
-    .then(logger('user'))
+return each(
+    doAsyncAuth(),        // Asumming this adds prop 'auth' to context
+    set(createAccountDocument),
+    logger('user'),
+    saveToDB()
+)()
 ```
 
 - `consoleTracer` is a pre-made simple console.log tracer ready to use
 
 ```javascript
-return startWith()
-    .then(consoleTracer('user'))
+return each(
+    doAsyncAuth(),        // Asumming this adds prop 'auth' to context
+    set(createAccountDocument),
+    consoleTracer('user'),
+    saveToDB()
+)()
 ```
 
 ### Error handling
 
-If you need to send and error in the pipeline you must use the `ContextError` type
-this will help error handling to recover and close the necessary resources. The context
-must be passed in the creating of the `ContextError` object.
+If you need to send and error in the pipeline you must return an exception.
+Depending in the context your async function is used the error message alone
+will be wrapped in a `ContextError`. This will help error handling to recover and close the necessary resources.
 
 ```javascript
 const myAsyncTask = () => context => {
     // doing some async stuff
 
     // oh no we found a error, lets throw
-    throw new ContextError('MyAsyncTaskError', context)
-}
-```
-
-If you are throwing the error as part of a promise chain inside your async task you can do
-
-```javascript
-const myAsyncTask = () => context => {
-    return asyncPromises()
-        .then(...)
-        .catch(throwContextError(context))
+    return Resolve.reject(new Error('MyAsyncTaskError'))
 }
 ```
 
 Passing the context in the error helps cleaning steps in the pipeline.
 
 ```javascript
-return startWith()
-    .then(connectToDB())
-    .then(myAsyncTask(...))
-    .catch(err => {
-        console.log(err.message)
-        return err.context
-    })
-    .then(closeDB())
+return each(
+    connectToDB(),
+    myAsyncTask(...),  // This returns an error
+    closeDB()          // This never gets executed
+)()
 ```
+
+We might want to capture the error and recover from it to close allocated resources. For that we use the `capture` async helper.
+
+```javascript
+return each(
+    connectToDB(),
+    capture(
+        myAsyncTask(...),   // This returns an error
+        noop()              // This will be executed only if there is an in the previous call error
+    ),
+    closeDB()               // This never will be executed
+)()
+```
+
+We can also define different error handlers depending on error type (message)
+
+```javascript
+return each(
+    connectToDB(),
+    capture(
+        myAsyncTask(...),   // This returns an error
+        {
+            'AsyncError': noop()              // This will be executed only if there is an in the previous call error,
+            'VeryRareAsyncError': logItRemotely()   // Will be executing if error.message === 'VeryRareAsyncError'
+        }
+    ),
+    closeDB()               // This never will be executed
+)()
+```
+
+Notice that if we don't provide a handler for some error type the whole async function will fail with a promise rejection containing the error.
 
 ## So, how to create async pipeline functions
 
@@ -286,26 +327,32 @@ look like this:
 ```javascript
 // Arrow function
 const myAsyncFunction = (params) => context => {
-
     // Async stuff depending on params that prob mutates context
+    if (someErrorCondition) {
+        return Promise.reject(new Error('MyCustomError'))
+    }
 
-    return context;
+    return Promise.resolve(context);
 }
 
 // Function notation
 function myAsyncFunction (params) {
     return function(context) {
         // Async stuff depending on params that prob mutates context
+        if (someErrorCondition) {
+            return Promise.reject(new Error('MyCustomError'))
+        }
 
-        return context;
+        return Promise.resolve(context);
     }
 }
 
 
 // Usage
-return startWith()
-    .then(myAsyncFunction(...))
-    .then(otherAsyncFunction(...))
+return each(
+    myAsyncFunction(...),
+    otherAsyncFunction(...)
+)({ starting: 'context' })
 ```
 
-This way you can write your own set of mongodb, redis, request, etc.
+This way you can write your own set for mongodb, redis, request, rabbitmq, etc.
