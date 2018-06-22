@@ -1,6 +1,6 @@
 {
   "name": "rvl-pipe",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Functions for easier async pipelining/composing of promises",
   "main": "index.js",
   "scripts": {
@@ -16,9 +16,7 @@
   "repository": "https://github.com/revelatio/rvl-pipe",
   "author": "Ernesto Freyre",
   "license": "MIT",
-  "dependencies": {
-    "ramda": "^0.25.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "ava": "^0.25.0",
     "coveralls": "^3.0.0",

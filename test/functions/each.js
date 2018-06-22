@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, capture, set, noop } = require('../../index')
+const { each, capture, set, noop, ensure } = require('../../index')
 const { delayedAsync, delayedFail } = require('../helpers/delayed-async')
 
 test('runs all tasks in serie', t => {
@@ -114,5 +114,50 @@ test('async step fails, no error type handler defined', t => {
     .catch(error => {
       t.is(error.message, 'UnexpectedError')
       t.deepEqual(error.context, {})
+    })
+})
+
+test('async step fails, always run last step', t => {
+  return ensure(
+    each(
+      delayedAsync(100, { name: 'John' }),
+      delayedFail(100, 'CustomError'),
+      delayedAsync(100, { last: 'Doe' })
+    ),
+    set({ didRecover: true })
+  )()
+    .then(context => {
+      t.deepEqual(
+        context,
+        {
+          didRecover: true
+        }
+      )
+    })
+    .catch(() => {
+      t.fail()
+    })
+})
+
+test('async step does not fails, always run last step', t => {
+  return ensure(
+    each(
+      delayedAsync(100, { name: 'John' }),
+      delayedAsync(100, { last: 'Doe' })
+    ),
+    set({ didRecover: true })
+  )()
+    .then(context => {
+      t.deepEqual(
+        context,
+        {
+          name: 'John',
+          last: 'Doe',
+          didRecover: true
+        }
+      )
+    })
+    .catch(() => {
+      t.fail()
     })
 })

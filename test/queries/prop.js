@@ -26,6 +26,5 @@ test('should evaluate nested prop from context including array index', t => {
     }
   }
   const result = prop('user.groups.0.name')(ctx)
-
   t.is(result, 'SevenDots')
 })

@@ -1,7 +1,6 @@
 const test = require('ava')
-const { all } = require('../../index')
+const { all, set } = require('../../index')
 const { delayedAsync, delayedFail } = require('../helpers/delayed-async')
-const R = require('ramda')
 
 test('runs all tasks in parallel', t => {
   const started = Date.now()
@@ -19,7 +18,10 @@ test('runs all tasks in parallel', t => {
 })
 
 test('all uses a default empty object', t => {
-  return all(R.merge({ name: 'John' }), R.merge({ last: 'Doe' }))()
+  return all(
+    set({ name: 'John' }),
+    set({ last: 'Doe' })
+  )()
     .then(ctx => {
       t.deepEqual(ctx, { name: 'John', last: 'Doe' })
     })

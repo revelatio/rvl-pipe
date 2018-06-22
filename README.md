@@ -31,7 +31,7 @@ You can require/import the helpers you need.
 const { should, each, iff, prop, props } = require('rvl-pipe')
 
 // as ES6 Modules
-import { should, each, startWith, iff, prop, props } from 'rvl-pipe'
+import { should, each, iff, prop, props } from 'rvl-pipe'
 ```
 
 ### Composition functions
@@ -298,6 +298,18 @@ return each(
         noop()              // This will be executed only if there is an in the previous call error
     ),
     closeDB()               // This never will be executed
+)()
+```
+
+Another way to achieve the same goal is to use the `ensure` function.
+
+```javascript
+return ensure(
+    each(
+        connectToDB(),
+        myAsyncTask(...),   // This returns an error
+    ),
+    closeDB()               // This never will be always executed
 )()
 ```
 
