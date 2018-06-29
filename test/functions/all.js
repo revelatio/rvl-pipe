@@ -1,5 +1,5 @@
 const test = require('ava')
-const { all, set } = require('../../index')
+const { all, set, always } = require('../../index')
 const { delayedAsync, delayedFail } = require('../helpers/delayed-async')
 
 test('runs all tasks in parallel', t => {
@@ -19,8 +19,8 @@ test('runs all tasks in parallel', t => {
 
 test('all uses a default empty object', t => {
   return all(
-    set({ name: 'John' }),
-    set({ last: 'Doe' })
+    set(always({ name: 'John' })),
+    set(always({ last: 'Doe' }))
   )()
     .then(ctx => {
       t.deepEqual(ctx, { name: 'John', last: 'Doe' })

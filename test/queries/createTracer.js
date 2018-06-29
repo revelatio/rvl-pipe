@@ -1,5 +1,5 @@
 const test = require('ava')
-const { createTracer, each, set } = require('../../index')
+const { createTracer, each, set, always } = require('../../index')
 
 test('should log using custom tracer', t => {
   const customTracer = createTracer((path, value) => {
@@ -8,7 +8,7 @@ test('should log using custom tracer', t => {
   })
 
   return each(
-    set({ name: 'John' }),
+    set(always({ name: 'John' })),
     customTracer('name')
   )()
 })

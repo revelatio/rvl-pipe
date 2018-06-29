@@ -1,5 +1,5 @@
 const { should, all, each, iff, noop, set } = require('./lib/functions')
-const { equals, passData, every, prop, props, some, consoleTracer, createTracer } = require('./lib/queries')
+const { equals, always, every, prop, props, some, consoleTracer, createTracer } = require('./lib/queries')
 const { ContextError, capture, ensure } = require('./lib/error')
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
   set,
 
   equals,
-  passData,
+  always,
   every,
   prop,
   props,

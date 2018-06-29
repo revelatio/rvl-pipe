@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, iff, equals } = require('../../index')
+const { each, iff, equals, always } = require('../../index')
 const { delayedAsync } = require('../helpers/delayed-async')
 
 test('should evaluate true for static values', t => {
@@ -7,7 +7,7 @@ test('should evaluate true for static values', t => {
 
   return each(
     iff(
-      equals(name, 'John'),
+      equals(always(name), always('John')),
       delayedAsync(100, { last: 'Doe' })
     )
   )()
@@ -19,7 +19,7 @@ test('should evaluate true for static values', t => {
 test('should evaluate true for dynamic values', t => {
   return each(
     iff(
-      equals(context => context.name, 'John'),
+      equals(context => context.name, always('John')),
       delayedAsync(100, { last: 'Doe' })
     )
   )({ name: 'John' })

@@ -1,11 +1,11 @@
 const test = require('ava')
-const { each, iff, some } = require('../../index')
+const { each, iff, some, always } = require('../../index')
 const { delayedAsync } = require('../helpers/delayed-async')
 
 test('should evaluate true if any element is truthy for static values', t => {
   return each(
     iff(
-      some(false, 0, 'John'),
+      some(always(false), always(0), always('John')),
       delayedAsync(100, { last: 'Doe' })
     )
   )()
@@ -17,7 +17,7 @@ test('should evaluate true if any element is truthy for static values', t => {
 test('should evaluate true if any element is truthy for dynamic values', t => {
   return each(
     iff(
-      some(ctx => ctx.shouldPass, 10),
+      some(ctx => ctx.shouldPass, always(10)),
       delayedAsync(100, { last: 'Doe' })
     )
   )({ name: 'John', shouldPass: false })

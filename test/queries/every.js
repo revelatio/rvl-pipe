@@ -1,11 +1,11 @@
 const test = require('ava')
-const { each, iff, every } = require('../../index')
+const { each, iff, every, always } = require('../../index')
 const { delayedAsync } = require('../helpers/delayed-async')
 
 test('should evaluate true if all elements truthy for static values', t => {
   return each(
     iff(
-      every(true, 1, 'John'),
+      every(always(true), always(1), always('John')),
       delayedAsync(100, { last: 'Doe' })
     )
   )()

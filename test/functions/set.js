@@ -1,8 +1,8 @@
 const test = require('ava')
-const { set } = require('../../index')
+const { set, always } = require('../../index')
 
-test('sets a static value in the context', t => {
-  return set({ name: 'John' })()
+test('sets a static value in the context using always function', t => {
+  return set(always({ name: 'John' }))()
     .then(context => {
       t.deepEqual(context, { name: 'John' })
     })
@@ -16,7 +16,7 @@ test('sets a dynamic value in the context', t => {
 })
 
 test('set uses a default empty object', t => {
-  return set({ name: 'John' })()
+  return set(always({ name: 'John' }))()
     .then(context => {
       t.deepEqual(context, { name: 'John' })
     })

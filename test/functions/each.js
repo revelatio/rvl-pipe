@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, capture, set, noop, ensure } = require('../../index')
+const { each, capture, set, noop, ensure, always } = require('../../index')
 const { delayedAsync, delayedFail } = require('../helpers/delayed-async')
 
 test('runs all tasks in serie', t => {
@@ -51,7 +51,7 @@ test('async step fails, recovers from error', t => {
     delayedAsync(100, { name: 'John' }),
     capture(
       delayedFail(100, 'CustomError'),
-      set({ error: 'FailedAsync' })
+      set(always({ error: 'FailedAsync' }))
     ),
     delayedAsync(100, { last: 'Doe' })
   )()
@@ -76,8 +76,8 @@ test('async step fails, recovers from different error types', t => {
     capture(
       delayedFail(100, 'CustomError'),
       {
-        'AnotherCustomError': set({ error: 'FailedAsyncWithAnotherCustomError' }),
-        'CustomError': set({ error: 'FailedAsyncWithCustomError' })
+        'AnotherCustomError': set(always({ error: 'FailedAsyncWithAnotherCustomError' })),
+        'CustomError': set(always({ error: 'FailedAsyncWithCustomError' }))
       }
     ),
     delayedAsync(100, { last: 'Doe' })
@@ -124,7 +124,7 @@ test('async step fails, always run last step', t => {
       delayedFail(100, 'CustomError'),
       delayedAsync(100, { last: 'Doe' })
     ),
-    set({ didRecover: true })
+    set(always({ didRecover: true }))
   )()
     .then(context => {
       t.deepEqual(
@@ -145,7 +145,7 @@ test('async step does not fails, always run last step', t => {
       delayedAsync(100, { name: 'John' }),
       delayedAsync(100, { last: 'Doe' })
     ),
-    set({ didRecover: true })
+    set(always({ didRecover: true }))
   )()
     .then(context => {
       t.deepEqual(

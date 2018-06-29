@@ -142,7 +142,7 @@ return noop()({})
 
 ```javascript
 return each(
-    set({ name: 'John' }), // statically
+    set(always({ name: 'John' })), // statically
     set(context => ({ last: 'Doe' })),  // dinamically
     set(context => ({ initial: context.name[0] }))
 )({ name: 'Mary' })
@@ -160,7 +160,7 @@ allow to perform logical operations on them.
 ```javascript
 return each(
     iff(
-        equals(prop('a'), 3),   // checkink a prop with a static value
+        equals(prop('a'), always(3)),   // checkink a prop with a static value
         doAsyncTask(...)
     ),
     iff(
@@ -170,25 +170,18 @@ return each(
 )({ a: 3, b: 3 })
 ```
 
-- `passData`: is a helper function to be able to build async tasks or
-composition that accepts both dynamically props or static values
+- `always`: is a helper function that returns the same value of the first parameter passed
 
 ```javascript
-const myAsyncStep = prop => context => {
-    const value = passData(prop, context)
-
-    // do something with the context
-    // based on value
-
-    return context
-}
+const name = always('John)
+const b = name()   // John
 ```
 
 - `every`: Evaluates true if all values or predicates are true
 
 ```javascript
 return iff(
-    every(prop('a'), prop('b'), true, 10),  // a and b must evaluate truthy for doAsyncTask to run
+    every(prop('a'), prop('b'), always(true), always(10)),  // a and b must evaluate truthy for doAsyncTask to run
     doASyncTask(...)
 )()
 ```

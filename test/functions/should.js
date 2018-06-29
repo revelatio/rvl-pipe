@@ -1,5 +1,5 @@
 const test = require('ava')
-const { should } = require('../../index')
+const { should, always } = require('../../index')
 
 test('doesnt throw if predicates truthy', t => {
   return should(() => true, 'ShouldNotFail')()
@@ -31,15 +31,15 @@ test('throws if predicates falsy, no error message', t => {
     })
 })
 
-test('should uses a default empty object', t => {
-  return should(true, 'Fail')()
+test('should uses a default empty object, using always', t => {
+  return should(always(true), 'Fail')()
     .then(context => {
       t.deepEqual(context, {})
     })
 })
 
-test('should uses a default empty object on predicate false', t => {
-  return should(false, 'Fail')()
+test('should uses a default empty object on predicate false, using always', t => {
+  return should(always(false), 'Fail')()
     .then(() => {
       t.fail()
     })
