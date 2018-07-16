@@ -173,7 +173,7 @@ return each(
 - `always`: is a helper function that returns the same value of the first parameter passed
 
 ```javascript
-const name = always('John)
+const name = always('John')
 const b = name()   // John
 ```
 
