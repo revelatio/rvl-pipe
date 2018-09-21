@@ -28,3 +28,17 @@ test('should evaluate nested prop from context including array index', t => {
   const result = prop('user.groups.0.name')(ctx)
   t.is(result, 'SevenDots')
 })
+
+test('should return undefined if object does not have path', t => {
+  const ctx = {
+    user: {
+      name: 'John',
+      groups: [
+        { name: 'SevenDots' },
+        { name: 'Rucka' }
+      ]
+    }
+  }
+  const result = prop('user.subject')(ctx)
+  t.is(result, undefined)
+})
