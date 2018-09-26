@@ -19,6 +19,14 @@ This library contains helper functions to do simple pipelining of promises
 reusing a context object that will be pass down and can be queried or
 modified.
 
+## Version 1.4.0 New functions
+
+Version 1.4.0 introduces new functions: `assign`, `composer` and `loop`
+
+- `assign`: For assign to a prop based on the result of a async function
+- `composer`: Performs a merge on the results of a set of async functions
+- `loop`: Performs a async loop based on a predicate and a body
+
 ## How it works?
 
 `rvl-pipe` provides a set of functions to help you create, interact and
@@ -150,6 +158,33 @@ return each(
 // returns { name: 'John', last: 'Doe', initial: 'J' }
 ```
 
+- `assign`: Will assign a prop based on the result of an async function
+
+```javascript
+return each(
+    assign('response', fetch('http://api.server.com/status'))
+)()
+
+// response will have the response of the async request
+```
+
+- `loop`: Very simple loop execution of async function based on an async predicate.
+
+```javascript
+return each(
+    loop(
+        ctx => ctx.index < 10,
+        each(
+            doSomethingElse(),
+            ctx => {
+                ctx.index += 1
+                return ctx
+            }
+        )
+    )
+)
+```
+
 ### Querying functions
 
 Querying functions can be used to pull data from the context and also
@@ -226,6 +261,29 @@ return each(
     set(createAccountDocument),
     saveToDB()
 )()
+```
+
+- `composer`: Composer merges the result of a set of async functions, very
+useful to craft objects where some properties are added based on predicates.
+
+```javascript
+const createObject = composer(
+    always({ name: 'John' }),
+    iff(
+        equals(prop('user'), always(1)),
+        always({ last: 'Doe' }),
+        always({})
+    ),
+    iff(
+        equals(prop('user'), always(2)),
+        always({ last: 'Perez' }),
+        always({})
+    )
+)
+
+const a = createObject({ user: 1 })    // { name: 'John', last: 'Doe' }
+const b = createObject({ user: 2 })    // { name: 'John', last: 'Perez' }
+const c = createObject({ user: 3 })    // { name: 'John' }
 ```
 
 - `createTracer`: Sometimes we need to trace some properties on the context.
