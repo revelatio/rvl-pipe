@@ -250,6 +250,7 @@ const createAccountDocument = props({
         name: prop('auth.username'),
         token: prop('auth.token'),
         newUser: true,
+        roles: ['admin', prop('auth.forRole')],
         team: {
             name: prop('auth.team')  // nested props too :)
         }

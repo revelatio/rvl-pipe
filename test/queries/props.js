@@ -46,7 +46,35 @@ test('should evaluate object from context passing dynamic props, using fn prop',
   )
 })
 
+test('should evaluate object with array', t => {
+  const ctx = { name: 'John', auth: { via: 'gh', token: '12873', group: 'seventh' } }
+
+  const result = props({
+    credentialsArray: [prop('name'), prop('auth.via'), { token: prop('auth.token') }, 32]
+  })(ctx)
+
+  t.deepEqual(
+    result,
+    {
+      'credentialsArray': [
+        'John',
+        'gh',
+        {
+          'token': '12873'
+        },
+        32
+      ]
+    }
+  )
+})
+
+
 test('props uses a default empty object', t => {
   const result = props({ name: 'John' })()
   t.deepEqual(result, { name: 'John' })
+})
+
+test('props uses a default empty object on array', t => {
+  const result = props({ name: ['John'] })()
+  t.deepEqual(result, { name: ['John'] })
 })
