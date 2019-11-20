@@ -1,6 +1,6 @@
 {
   "name": "rvl-pipe",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Functions for easier async pipelining/composing of promises",
   "main": "index.js",
   "scripts": {

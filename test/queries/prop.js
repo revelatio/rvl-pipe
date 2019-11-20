@@ -42,3 +42,16 @@ test('should return undefined if object does not have path', t => {
   const result = prop('user.subject')(ctx)
   t.is(result, undefined)
 })
+
+test('should return falsy value', t => {
+  const ctx = {
+    user: {
+      name: 'John',
+      isAdmin: false,
+      projects: 0
+    }
+  }
+  t.is(prop('user.isAdmin')(ctx), false)
+  t.is(prop('user.projects')(ctx), 0)
+})
+
