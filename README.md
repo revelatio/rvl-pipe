@@ -19,6 +19,23 @@ This library contains helper functions to do simple pipelining of promises
 reusing a context object that will be pass down and can be queried or
 modified.
 
+## Version 2.0.0 the one with Typings (in TypeScript)
+
+This version is the first completely ported to TypeScript so
+the build process exports the type definitions. 
+
+We have 3 main function definitions
+
+```typescript
+export type Context = { [key: string]: any }
+
+export type AsyncFunction = (ctx?: Context) => Promise<Context>
+
+export type SyncFunction = (ctx: Context) => any
+
+export type SyncPredicate = (ctx: Context) => boolean
+```
+
 ## Version 1.4.0 New functions
 
 Version 1.4.0 introduces new functions: `assign`, `composer` and `loop`
@@ -46,7 +63,7 @@ import { should, each, iff, prop, props } from 'rvl-pipe'
 Composition functions can be always described as:
 
 ```javascript
-const createStep = (params) => context => Promise(context)
+const createStep = (params) => AsyncFunction
 ```
 
 So, basically functions that return a function that only takes the `context`
@@ -195,7 +212,7 @@ allow to perform logical operations on them.
 ```javascript
 return each(
     iff(
-        equals(prop('a'), always(3)),   // checkink a prop with a static value
+        equals(prop('a'), always(3)),   // checking a prop with a static value
         doAsyncTask(...)
     ),
     iff(
@@ -420,3 +437,26 @@ return each(
 ```
 
 This way you can write your own set for mongodb, redis, request, rabbitmq, etc.
+
+## Async / Await
+
+Async/Await in JavaScript is based on Promises. Since all async pipeline functions
+return a Promise of a Context you can also do:
+
+```typescript
+const performTask = each(
+    connectToDB(),
+    capture(
+        myAsyncTask(...),   // This returns an error
+        each(
+            logItRemotely(),
+            always({ error: 'failed' })
+        )
+    ),
+    closeDB(),
+    props({ result: 'ok' })
+)
+
+const result = await performTask()
+console.log(result)
+```  

@@ -1,32 +1,55 @@
 {
   "name": "rvl-pipe",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "description": "Functions for easier async pipelining/composing of promises",
-  "main": "index.js",
+  "main": "build/index.js",
+  "module": "build/index.es.js",
+  "jsnext:main": "build/index.es.js",
   "scripts": {
-    "test": "nyc ava",
-    "unit": "ava --verbose",
+    "test": "jest --coverage",
+    "build": "rollup -c",
     "lint": "standard",
-    "report": "nyc report --reporter=html"
+    "format": "prettier-standard --format"
   },
   "keywords": [
     "pipe",
     "promises",
     "async"
   ],
+  "files": [
+    "build"
+  ],
   "repository": "https://github.com/revelatio/rvl-pipe",
   "author": "Ernesto Freyre",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "ava": "^2.4.0",
-    "coveralls": "^3.0.6",
-    "nyc": "^14.1.1",
-    "standard": "^14.3.1"
+    "@types/jest": "^24.9.0",
+    "coveralls": "^3.0.9",
+    "jest": "^24.9.0",
+    "prettier-standard": "^16.1.0",
+    "rollup": "^1.29.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "standard": "^14.3.1",
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.7.5"
   },
-  "ava": {
-    "helpers": [
-      "**/helpers/**/*"
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [ "**/__tests__/**/*.spec.ts" ]
+  },
+  "standard": {
+    "ignore": [
+      "node_modules/",
+      "build/"
+    ],
+    "globals": [
+      "test",
+      "expect"
     ]
   }
 }
