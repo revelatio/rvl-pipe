@@ -27,6 +27,7 @@
     "@types/jest": "^24.9.0",
     "coveralls": "^3.0.9",
     "jest": "^24.9.0",
+    "nyc": "^15.0.0",
     "prettier-standard": "^16.1.0",
     "rollup": "^1.29.0",
     "rollup-plugin-commonjs": "^10.1.0",
@@ -40,7 +41,9 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "testMatch": [ "**/__tests__/**/*.spec.ts" ]
+    "testMatch": [
+      "**/__tests__/**/*.spec.ts"
+    ]
   },
   "standard": {
     "ignore": [
