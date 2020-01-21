@@ -1,0 +1,12 @@
+import { AsyncFunction, Context, SyncFunction, SyncPredicate } from './defs';
+export declare const always: (data: any) => SyncFunction;
+export declare const props: (obj: Context) => SyncFunction;
+export declare const prop: (path: string) => SyncFunction;
+export declare const equals: (sourceA: SyncFunction, sourceB: SyncFunction) => SyncPredicate;
+export declare const every: (...conditions: SyncPredicate[]) => SyncPredicate;
+export declare const some: (...conditions: SyncPredicate[]) => SyncPredicate;
+export declare type TracerCreatorFunction = (path: string, value: any) => any;
+export declare type TracerFunction = (path: string) => AsyncFunction;
+export declare const createTracer: (tracer: TracerCreatorFunction) => TracerFunction;
+export declare const consoleTracer: TracerFunction;
+export declare const composer: (...partsFn: AsyncFunction[]) => AsyncFunction;
