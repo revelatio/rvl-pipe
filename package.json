@@ -1,6 +1,6 @@
 {
   "name": "rvl-pipe",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Functions for easier async pipelining/composing of promises",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -24,19 +24,19 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@types/jest": "^24.9.0",
-    "coveralls": "^3.0.9",
-    "jest": "^24.9.0",
-    "nyc": "^15.0.0",
-    "prettier-standard": "^16.1.0",
-    "rollup": "^1.29.0",
+    "@types/jest": "^25.2.3",
+    "coveralls": "^3.1.0",
+    "jest": "^26.0.1",
+    "nyc": "^15.0.1",
+    "prettier": "^2.0.5",
+    "rollup": "^2.11.2",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-peer-deps-external": "^2.2.0",
-    "rollup-plugin-typescript2": "^0.25.3",
-    "standard": "^14.3.1",
-    "ts-jest": "^24.3.0",
-    "typescript": "^3.7.5"
+    "rollup-plugin-peer-deps-external": "^2.2.2",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "standard": "^14.3.4",
+    "ts-jest": "^26.1.0",
+    "typescript": "^3.9.3"
   },
   "jest": {
     "preset": "ts-jest",
