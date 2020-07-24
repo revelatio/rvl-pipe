@@ -44,6 +44,7 @@ export const should = (predicate: SyncPredicate, errorCode: string | Error): Asy
       ;(errorCode as any).context = ctx
       return Promise.reject(errorCode)
     }
+
     return Promise.reject(new ContextError(errorCode, ctx))
   }
 
