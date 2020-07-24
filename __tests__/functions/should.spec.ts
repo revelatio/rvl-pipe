@@ -1,4 +1,4 @@
-import { should, always, ContextError } from '../../src'
+import { should, always } from '../../src'
 
 test('doesnt throw if predicates truthy', done => {
   return should(() => true, 'ShouldNotFail')()
@@ -42,7 +42,6 @@ test('should pass error if specified', done => {
       done.fail()
     })
     .catch(error => {
-      expect(error instanceof ContextError).toBeFalsy()
       expect(error.message).toEqual('standard-error')
       done()
     })

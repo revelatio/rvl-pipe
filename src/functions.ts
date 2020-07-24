@@ -1,4 +1,3 @@
-import { ContextError } from './error'
 import { AsyncFunction, Context, SyncFunction, SyncPredicate } from './defs'
 
 export const set = (prop: SyncFunction): AsyncFunction => (ctx: Context = {}) =>
@@ -23,16 +22,11 @@ export const iff = (
 }
 
 export const all = (...tasks: AsyncFunction[]): AsyncFunction => (ctx: Context = {}) =>
-  Promise.all(tasks.map(task => task(ctx)))
-    .then(contexts => Object.assign({}, ...contexts))
-    .catch(error => Promise.reject(new ContextError(error.message, ctx)))
+  Promise.all(tasks.map(task => task(ctx))).then(contexts => Object.assign({}, ...contexts))
 
 export const each = (...tasks: (AsyncFunction | SyncFunction)[]): AsyncFunction => (
   ctx: Context = {}
-) =>
-  Promise.resolve(
-    tasks.reduce((result, task) => result.then(task), Promise.resolve(ctx))
-  ).catch(error => Promise.reject(new ContextError(error.message, ctx)))
+) => Promise.resolve(tasks.reduce((result, task) => result.then(task), Promise.resolve(ctx)))
 
 export const should = (predicate: SyncPredicate, errorCode: string | Error): AsyncFunction => (
   ctx: Context = {}
@@ -41,11 +35,10 @@ export const should = (predicate: SyncPredicate, errorCode: string | Error): Asy
 
   if (!passes) {
     if (errorCode instanceof Error) {
-      ;(errorCode as any).context = ctx
       return Promise.reject(errorCode)
     }
 
-    return Promise.reject(new ContextError(errorCode, ctx))
+    return Promise.reject(new Error(errorCode))
   }
 
   return Promise.resolve(ctx)

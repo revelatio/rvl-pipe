@@ -1,5 +1,5 @@
 export { AsyncFunction, SyncFunction, SyncPredicate, Context } from './defs'
-export { capture, ContextError, ensure } from './error'
+export { capture, ensure } from './error'
 export { set, all, assign, each, iff, loop, noop, should } from './functions'
 export {
   TracerFunction,

@@ -4,22 +4,18 @@ import { delayedAsync, delayedFail } from '../helpers/delayed-async'
 test('runs all tasks serially', () => {
   const started = Date.now()
 
-  return each(
-    delayedAsync(500, { name: 'John' }),
-    delayedAsync(500, { last: 'Doe' })
-  )().then(context => {
-    expect(context).toEqual({ name: 'John', last: 'Doe' })
-    const duration = Date.now() - started
-    expect(duration > 1000).toBe(true)
-    expect(duration < 1200).toBe(true)
-  })
+  return each(delayedAsync(500, { name: 'John' }), delayedAsync(500, { last: 'Doe' }))().then(
+    context => {
+      expect(context).toEqual({ name: 'John', last: 'Doe' })
+      const duration = Date.now() - started
+      expect(duration > 1000).toBe(true)
+      expect(duration < 1200).toBe(true)
+    }
+  )
 })
 
 test('starting with each good for reusable steps', () => {
-  const step = each(
-    delayedAsync(100, { name: 'John' }),
-    delayedAsync(100, { last: 'Doe' })
-  )
+  const step = each(delayedAsync(100, { name: 'John' }), delayedAsync(100, { last: 'Doe' }))
 
   expect(step).not.toBeFalsy()
 
@@ -39,7 +35,6 @@ test('async step fails, context remains untouched', done => {
     })
     .catch(error => {
       expect(error.message).toBe('CustomError')
-      expect(error.context).toEqual({ name: 'John' })
       done()
     })
 })
@@ -47,10 +42,7 @@ test('async step fails, context remains untouched', done => {
 test('async step fails, recovers from error', async () => {
   const context = await each(
     delayedAsync(100, { name: 'John' }),
-    capture(
-      delayedFail(100, 'CustomError'),
-      set(always({ error: 'FailedAsync' }))
-    ),
+    capture(delayedFail(100, 'CustomError'), set(always({ error: 'FailedAsync' }))),
     delayedAsync(100, { last: 'Doe' })
   )()
 
@@ -65,9 +57,7 @@ test('async step fails, recovers from different error types', done => {
   return each(
     delayedAsync(100, { name: 'John' }),
     capture(delayedFail(100, 'CustomError'), {
-      AnotherCustomError: set(
-        always({ error: 'FailedAsyncWithAnotherCustomError' })
-      ),
+      AnotherCustomError: set(always({ error: 'FailedAsyncWithAnotherCustomError' })),
       CustomError: set(always({ error: 'FailedAsyncWithCustomError' }))
     }),
     delayedAsync(100, { last: 'Doe' })
@@ -98,7 +88,6 @@ test('async step fails, no error type handler defined', done => {
     })
     .catch(error => {
       expect(error.message).toBe('UnexpectedError')
-      expect(error.context).toEqual({ name: 'John' })
       done()
     })
 })
@@ -114,8 +103,7 @@ test('async step fails, always run last step', done => {
   )()
     .then(context => {
       expect(context).toEqual({
-        didRecover: true,
-        name: 'John'
+        didRecover: true
       })
       done()
     })
@@ -126,10 +114,7 @@ test('async step fails, always run last step', done => {
 
 test('async step does not fails, always run last step', done => {
   return ensure(
-    each(
-      delayedAsync(100, { name: 'John' }),
-      delayedAsync(100, { last: 'Doe' })
-    ),
+    each(delayedAsync(100, { name: 'John' }), delayedAsync(100, { last: 'Doe' })),
     set(always({ didRecover: true }))
   )()
     .then(context => {

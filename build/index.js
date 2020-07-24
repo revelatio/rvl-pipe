@@ -2,55 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-var extendStatics = function(d, b) {
-    extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return extendStatics(d, b);
-};
-
-function __extends(d, b) {
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-}
-
-var ContextError = /** @class */ (function (_super) {
-    __extends(ContextError, _super);
-    function ContextError(message, context) {
-        var _this = _super.call(this, message) || this;
-        _this.name = 'ContextError';
-        _this.message = message;
-        _this.context = context;
-        Object.setPrototypeOf(_this, Error.prototype);
-        return _this;
-    }
-    return ContextError;
-}(Error));
 var capture = function (step, handler) { return function (ctx) {
     if (ctx === void 0) { ctx = {}; }
     return step(ctx).catch(function (error) {
@@ -65,9 +16,32 @@ var capture = function (step, handler) { return function (ctx) {
 }; };
 var ensure = function (step, handler) { return function (ctx) {
     return step(ctx)
-        .catch(function (error) { return Promise.resolve(error.context); })
+        .catch(function () { return Promise.resolve(ctx); })
         .then(handler);
 }; };
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
 
 var set = function (prop) { return function (ctx) {
     if (ctx === void 0) { ctx = {}; }
@@ -91,9 +65,7 @@ var all = function () {
     }
     return function (ctx) {
         if (ctx === void 0) { ctx = {}; }
-        return Promise.all(tasks.map(function (task) { return task(ctx); }))
-            .then(function (contexts) { return Object.assign.apply(Object, __spreadArrays([{}], contexts)); })
-            .catch(function (error) { return Promise.reject(new ContextError(error.message, ctx)); });
+        return Promise.all(tasks.map(function (task) { return task(ctx); })).then(function (contexts) { return Object.assign.apply(Object, __spreadArrays([{}], contexts)); });
     };
 };
 var each = function () {
@@ -103,7 +75,7 @@ var each = function () {
     }
     return function (ctx) {
         if (ctx === void 0) { ctx = {}; }
-        return Promise.resolve(tasks.reduce(function (result, task) { return result.then(task); }, Promise.resolve(ctx))).catch(function (error) { return Promise.reject(new ContextError(error.message, ctx)); });
+        return Promise.resolve(tasks.reduce(function (result, task) { return result.then(task); }, Promise.resolve(ctx)));
     };
 };
 var should = function (predicate, errorCode) { return function (ctx) {
@@ -111,10 +83,9 @@ var should = function (predicate, errorCode) { return function (ctx) {
     var passes = predicate(ctx);
     if (!passes) {
         if (errorCode instanceof Error) {
-            errorCode.context = ctx;
             return Promise.reject(errorCode);
         }
-        return Promise.reject(new ContextError(errorCode, ctx));
+        return Promise.reject(new Error(errorCode));
     }
     return Promise.resolve(ctx);
 }; };
@@ -229,7 +200,6 @@ var composer = function () {
     };
 };
 
-exports.ContextError = ContextError;
 exports.all = all;
 exports.always = always;
 exports.assign = assign;
