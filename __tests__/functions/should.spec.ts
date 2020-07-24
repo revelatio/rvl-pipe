@@ -35,3 +35,14 @@ test('should uses a default empty object on predicate false, using always', done
       done()
     })
 })
+
+test('should pass error if specified', done => {
+  return should(always(false), new Error('standard-error'))()
+    .then(() => {
+      done.fail()
+    })
+    .catch(error => {
+      expect(error.message).toEqual('standard-error')
+      done()
+    })
+})

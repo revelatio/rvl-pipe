@@ -110,6 +110,10 @@ var should = function (predicate, errorCode) { return function (ctx) {
     if (ctx === void 0) { ctx = {}; }
     var passes = predicate(ctx);
     if (!passes) {
+        if (errorCode instanceof Error) {
+            errorCode.context = ctx;
+            return Promise.reject(errorCode);
+        }
         return Promise.reject(new ContextError(errorCode, ctx));
     }
     return Promise.resolve(ctx);

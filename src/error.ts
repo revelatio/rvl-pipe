@@ -1,7 +1,7 @@
 import { AsyncFunction, Context } from './defs'
 
 export class ContextError extends Error {
-  context: {}
+  context: any
 
   constructor (message: string, context: {}) {
     super(message)

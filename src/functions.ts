@@ -22,40 +22,39 @@ export const iff = (
   return Promise.resolve(ctx)
 }
 
-export const all = (...tasks: AsyncFunction[]): AsyncFunction => (
-  ctx: Context = {}
-) =>
+export const all = (...tasks: AsyncFunction[]): AsyncFunction => (ctx: Context = {}) =>
   Promise.all(tasks.map(task => task(ctx)))
     .then(contexts => Object.assign({}, ...contexts))
     .catch(error => Promise.reject(new ContextError(error.message, ctx)))
 
-export const each = (
-  ...tasks: (AsyncFunction | SyncFunction)[]
-): AsyncFunction => (ctx: Context = {}) =>
+export const each = (...tasks: (AsyncFunction | SyncFunction)[]): AsyncFunction => (
+  ctx: Context = {}
+) =>
   Promise.resolve(
     tasks.reduce((result, task) => result.then(task), Promise.resolve(ctx))
   ).catch(error => Promise.reject(new ContextError(error.message, ctx)))
 
-export const should = (
-  predicate: SyncPredicate,
-  errorCode: string
-): AsyncFunction => (ctx: Context = {}) => {
+export const should = (predicate: SyncPredicate, errorCode: string | Error): AsyncFunction => (
+  ctx: Context = {}
+) => {
   const passes = predicate(ctx)
 
   if (!passes) {
+    if (errorCode instanceof Error) {
+      ;(errorCode as any).context = ctx
+      return Promise.reject(errorCode)
+    }
     return Promise.reject(new ContextError(errorCode, ctx))
   }
 
   return Promise.resolve(ctx)
 }
 
-export const noop = (): AsyncFunction => (ctx: Context = {}) =>
-  Promise.resolve(ctx)
+export const noop = (): AsyncFunction => (ctx: Context = {}) => Promise.resolve(ctx)
 
-export const loop = (
-  condition: SyncPredicate,
-  body: AsyncFunction
-): AsyncFunction => (ctx: Context = {}) => {
+export const loop = (condition: SyncPredicate, body: AsyncFunction): AsyncFunction => (
+  ctx: Context = {}
+) => {
   const bodyPromise: AsyncFunction = ctx =>
     body(ctx).then(context => {
       return Promise.resolve(condition(context)).then(conditionResult => {
@@ -70,10 +69,6 @@ export const loop = (
   return bodyPromise(ctx)
 }
 
-export const assign = (
-  propName: string,
-  composerFn: AsyncFunction
-): AsyncFunction => (ctx: Context = {}) =>
-  Promise.resolve(composerFn(ctx)).then(value =>
-    Object.assign(ctx, { [propName]: value })
-  )
+export const assign = (propName: string, composerFn: AsyncFunction): AsyncFunction => (
+  ctx: Context = {}
+) => Promise.resolve(composerFn(ctx)).then(value => Object.assign(ctx, { [propName]: value }))

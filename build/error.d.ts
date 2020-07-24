@@ -1,6 +1,6 @@
 import { AsyncFunction } from './defs';
 export declare class ContextError extends Error {
-    context: {};
+    context: any;
     constructor(message: string, context: {});
 }
 export declare const capture: (step: AsyncFunction, handler: AsyncFunction | {
