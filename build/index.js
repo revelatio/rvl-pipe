@@ -82,10 +82,10 @@ var should = function (predicate, errorCode) { return function (ctx) {
     if (ctx === void 0) { ctx = {}; }
     var passes = predicate(ctx);
     if (!passes) {
-        if (errorCode instanceof Error) {
-            return Promise.reject(errorCode);
+        if (typeof errorCode === 'string') {
+            return Promise.reject(new Error(errorCode));
         }
-        return Promise.reject(new Error(errorCode));
+        return Promise.reject(errorCode);
     }
     return Promise.resolve(ctx);
 }; };
